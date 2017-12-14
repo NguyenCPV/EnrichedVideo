@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
@@ -96,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Creation WEBVIEW
         webview = (WebView) findViewById(R.id.web_view);
+        webview.setWebViewClient(new WebViewClient());
         webview.loadUrl("https://en.wikipedia.org/wiki/Big_Buck_Bunny");
 
 
