@@ -9,14 +9,22 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "MainActivity";
+    private final String PROGRESS_WEB_VIEW="Progress web view";
 
     private VideoView myVideoView;
     private int position = 0;
@@ -24,33 +32,22 @@ public class MainActivity extends AppCompatActivity {
     private MediaController mediaControls;
     private WebView webview;
 
-    //Handler
     private Handler mHandler;
+    private Thread mThread;
+
+    private int currentVideoDuration = 0;
+    private Map<String,Integer> dictChapiter = new HashMap<>();
+
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Creation VIDEOVIEW
         // Get the layout from video_main.xml
         setContentView(R.layout.activity_main);
 
         //Remove the notification bar (full screen)
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-
-        this.mHandler = new Handler(Looper.getMainLooper()){
-            /*
-             * handleMessage() defines the operations to perform when
-             * the Handler receives a new Message to process.
-             */
-                @Override
-                public void handleMessage(Message inputMessage) {
-                    // Gets the image task from the incoming Message object.
-
-                }
-        };
-
 
 
         //Video
@@ -95,19 +92,129 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         //Creation WEBVIEW
         webview = (WebView) findViewById(R.id.web_view);
         webview.setWebViewClient(new WebViewClient());
         webview.loadUrl("https://en.wikipedia.org/wiki/Big_Buck_Bunny");
 
 
+        //Dictionary dictChapiter
+        dictChapiter.clear();
+        dictChapiter.put("Intro", 0);
+        dictChapiter.put("Title", 28);
+        dictChapiter.put("Assault", 2*60+40);
+        dictChapiter.put("Payback", 4*60+50);
+        dictChapiter.put("Butterflies", 1*60+15);
+        dictChapiter.put("Cast", 8*60+15);
 
+        //Button
+        Button btnIntro = findViewById(R.id.btnIntro);
+        Button btnTitle = findViewById(R.id.btnTitle);
+        Button btnAssault = findViewById(R.id.btnAssault);
+        Button btnButterflies = findViewById(R.id.btnButterflies);
+        Button btnPayback = findViewById(R.id.btnPayback);
+        Button btnCast = findViewById(R.id.btnCast);
+
+        btnIntro.setTag("Intro");
+        btnTitle.setTag("Title");
+        btnAssault.setTag("Assault");
+        btnButterflies.setTag("Butterflies");
+        btnPayback.setTag("Payback");
+        btnCast.setTag("Cast");
+
+        btnIntro.setOnClickListener(myOnlyHandler);
+        btnTitle.setOnClickListener(myOnlyHandler);
+        btnAssault.setOnClickListener(myOnlyHandler);
+        btnButterflies.setOnClickListener(myOnlyHandler);
+        btnPayback.setOnClickListener(myOnlyHandler);
+        btnCast.setOnClickListener(myOnlyHandler);
+
+
+
+        //Handler
+        mHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg){
+                int result=msg.getData().getInt(PROGRESS_WEB_VIEW);
+                Log.d(TAG,"Message received :" + result);
+            }
+        };
     }
+
+    /**
+     * In this function, we work on the handler (thread + send message)
+     * The handler will (normaly) receive a bundle message
+     * The message will be treated in the handleMessage(msg) function
+     *
+     */
+    public void onStart(){
+        Log.d(TAG,"OnStart called");
+        super.onStart();
+        mThread = new Thread(new Runnable() {
+            //Le Bundle qui porte les données du Message et sera transmis au Handler
+            Bundle messageBundle=new Bundle();
+             //Le message échangé entre la Thread et le Handler
+            Message myMessage;
+            @Override
+            public void run() {
+                try {
+                    while(true) {
+                        if(myVideoView.isPlaying()) {
+                            Log.d(TAG, "Running, current position : " + myVideoView.getCurrentPosition());
+                        }
+                        Thread.sleep(1000);
+                        // Envoyer le message au Handler (la méthode handler.obtainMessage est plus efficace
+                        // que créer un message à partir de rien, optimisation du pool de message du Handler)
+                        //Instanciation du message (la bonne méthode):
+                        myMessage=mHandler.obtainMessage();
+                        //Ajouter des données à transmettre au Handler via le Bundle
+                        messageBundle.putInt(PROGRESS_WEB_VIEW, 1);
+                        //Ajouter le Bundle au message
+                        myMessage.setData(messageBundle);
+                        //Envoyer le message
+                        mHandler.sendMessage(myMessage);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        mThread.start();
+    }
+
+    private View.OnClickListener myOnlyHandler = new View.OnClickListener() {
+        public void onClick(View v) {
+            //Just a test
+            Log.d(TAG,"Button on clicked, button tag: "+v.getTag());
+            Log.d(TAG,"Button on clicked, video goes to : "+dictChapiter.get(v.getTag()));
+            Log.d(TAG,"Button on clicked, video currentDuration : "+myVideoView.getCurrentPosition());
+            try{
+                myVideoView.seekTo(dictChapiter.get(v.getTag())*1000);
+            } catch (Exception e){
+                Log.d(TAG, "Exception " + e);
+            }
+
+        }
+    };
+
+    private Runnable checkCurrentPositionAndMoveWebView = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG,"Running, current position : " + myVideoView.getCurrentPosition());
+
+        }
+    };
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
+        //Interrupt the current thread (or else, multiple messages are going to be sent to the handler)
+        mThread.interrupt();
+        //Save the current video position in order to restore
         savedInstanceState.putInt("Position", myVideoView.getCurrentPosition());
+        //Pause the video (why not)
         myVideoView.pause();
     }
 

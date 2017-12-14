@@ -54,36 +54,42 @@
 
         <Button
             android:id="@+id/btnIntro"
+            android:tag="Intro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Intro" />
 
         <Button
             android:id="@+id/btnTitle"
+            android:tag="Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Title" />
 
         <Button
             android:id="@+id/btnButterflies"
+            android:tag="Butterflie"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Buterflie" />
 
         <Button
             android:id="@+id/btnAssault"
+            android:tag="Assault"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Assault" />
 
         <Button
             android:id="@+id/btnPayback"
+            android:tag="Payback"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Payback" />
 
         <Button
             android:id="@+id/btnCast"
+            android:tag="Cast"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cast" />
