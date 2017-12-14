@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
+import android.webkit.WebView;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private int position = 0;
     private ProgressDialog progressDialog;
     private MediaController mediaControls;
+    private WebView webview;
 
     //Handler
     private Handler mHandler;
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Creation VIDEOVIEW
         // Get the layout from video_main.xml
         setContentView(R.layout.activity_main);
 
@@ -90,6 +93,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        //Creation WEBVIEW
+        webview = (WebView) findViewById(R.id.web_view);
+        webview.loadUrl("https://en.wikipedia.org/wiki/Big_Buck_Bunny");
+
+
 
     }
 
