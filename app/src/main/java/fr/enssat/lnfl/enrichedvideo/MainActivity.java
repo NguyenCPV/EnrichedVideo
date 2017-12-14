@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,8 +16,6 @@ import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -27,17 +24,18 @@ public class MainActivity extends AppCompatActivity {
     private final String PROGRESS_WEB_VIEW="Progress web view";
 
     private VideoView myVideoView;
+    private WebView webview;
+
     private int position = 0;
     private ProgressDialog progressDialog;
     private MediaController mediaControls;
-    private WebView webview;
 
     private Handler mHandler;
     private Thread mThread;
 
-    private int currentVideoDuration = 0;
-    private Map<String,Integer> dictChapiter = new HashMap<>();
-
+    private String currentWebViewTitle = "Intro";
+    private String Url = "https://en.wikipedia.org/wiki/Big_Buck_Bunny";
+    private MetadataManager metadataManager;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -49,6 +47,17 @@ public class MainActivity extends AppCompatActivity {
         //Remove the notification bar (full screen)
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        //MetadataManager
+        metadataManager = new MetadataManager();
+        metadataManager.add(0,"Intro","");
+        metadataManager.add(28,"Title","Production_history");
+        metadataManager.add(2*60+40,"Assault","Release");
+        metadataManager.add(4*60+50,"Payback","Plot");
+        metadataManager.add(60+15,"Butterflies","Characters");
+        metadataManager.add(8*60+15,"Cast","See_also");
+
+
+
 
         //Video
         if (mediaControls == null) {
@@ -56,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Find your VideoView in your video_main.xml layout
-        myVideoView = (VideoView) findViewById(R.id.video_view);
+        myVideoView = findViewById(R.id.video_view);
 
         // Create a progressbar
         progressDialog = new ProgressDialog(MainActivity.this);
@@ -93,20 +102,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        //Creation WEBVIEW
-        webview = (WebView) findViewById(R.id.web_view);
+
+        //WebView
+        webview = findViewById(R.id.web_view);
         webview.setWebViewClient(new WebViewClient());
         webview.loadUrl("https://en.wikipedia.org/wiki/Big_Buck_Bunny");
 
-
-        //Dictionary dictChapiter
-        dictChapiter.clear();
-        dictChapiter.put("Intro", 0);
-        dictChapiter.put("Title", 28);
-        dictChapiter.put("Assault", 2*60+40);
-        dictChapiter.put("Payback", 4*60+50);
-        dictChapiter.put("Butterflies", 1*60+15);
-        dictChapiter.put("Cast", 8*60+15);
 
         //Button
         Button btnIntro = findViewById(R.id.btnIntro);
@@ -131,13 +132,13 @@ public class MainActivity extends AppCompatActivity {
         btnCast.setOnClickListener(myOnlyHandler);
 
 
-
         //Handler
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg){
-                int result=msg.getData().getInt(PROGRESS_WEB_VIEW);
-                Log.d(TAG,"Message received :" + result);
+                String url=msg.getData().getString(PROGRESS_WEB_VIEW);
+                Log.d(TAG,"Message received :" + url);
+                webview.loadUrl(url);
             }
         };
     }
@@ -162,18 +163,28 @@ public class MainActivity extends AppCompatActivity {
                     while(true) {
                         if(myVideoView.isPlaying()) {
                             Log.d(TAG, "Running, current position : " + myVideoView.getCurrentPosition());
+                            Log.d(TAG, "currentWebViewTitle : " + currentWebViewTitle);
+                            Log.d(TAG, "metadataManager.getContextByPosition(myVideoView.getCurrentPosition()/1000)) : " + metadataManager.getContextByPosition(myVideoView.getCurrentPosition()/1000));
+
+                            if(!currentWebViewTitle.equals(metadataManager.getContextByPosition(myVideoView.getCurrentPosition()/1000))){
+
+                                currentWebViewTitle = metadataManager.getContextByPosition(myVideoView.getCurrentPosition()/1000);
+                                // Envoyer le message au Handler (la méthode handler.obtainMessage est plus efficace
+                                // que créer un message à partir de rien, optimisation du pool de message du Handler)
+                                //Instanciation du message (la bonne méthode):
+                                myMessage=mHandler.obtainMessage();
+                                //Ajouter des données à transmettre au Handler via le Bundle
+                                messageBundle.putString(PROGRESS_WEB_VIEW, metadataManager.getUrlByPosition(myVideoView.getCurrentPosition()/1000));
+                                //Ajouter le Bundle au message
+                                myMessage.setData(messageBundle);
+                                //Envoyer le message
+                                mHandler.sendMessage(myMessage);
+                            }
+
+
                         }
+                        //Let other threads to work
                         Thread.sleep(1000);
-                        // Envoyer le message au Handler (la méthode handler.obtainMessage est plus efficace
-                        // que créer un message à partir de rien, optimisation du pool de message du Handler)
-                        //Instanciation du message (la bonne méthode):
-                        myMessage=mHandler.obtainMessage();
-                        //Ajouter des données à transmettre au Handler via le Bundle
-                        messageBundle.putInt(PROGRESS_WEB_VIEW, 1);
-                        //Ajouter le Bundle au message
-                        myMessage.setData(messageBundle);
-                        //Envoyer le message
-                        mHandler.sendMessage(myMessage);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -188,21 +199,13 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             //Just a test
             Log.d(TAG,"Button on clicked, button tag: "+v.getTag());
-            Log.d(TAG,"Button on clicked, video goes to : "+dictChapiter.get(v.getTag()));
+            Log.d(TAG,"Button on clicked, video goes to : "+ metadataManager.getPositionByContext(v.getTag().toString()));
             Log.d(TAG,"Button on clicked, video currentDuration : "+myVideoView.getCurrentPosition());
             try{
-                myVideoView.seekTo(dictChapiter.get(v.getTag())*1000);
+                myVideoView.seekTo(metadataManager.getPositionByContext(v.getTag().toString())*1000);
             } catch (Exception e){
                 Log.d(TAG, "Exception " + e);
             }
-
-        }
-    };
-
-    private Runnable checkCurrentPositionAndMoveWebView = new Runnable() {
-        @Override
-        public void run() {
-            Log.d(TAG,"Running, current position : " + myVideoView.getCurrentPosition());
 
         }
     };
