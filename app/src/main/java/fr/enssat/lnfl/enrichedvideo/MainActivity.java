@@ -3,6 +3,9 @@ package fr.enssat.lnfl.enrichedvideo;
 import android.app.ProgressDialog;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +21,9 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private MediaController mediaControls;
 
+    //Handler
+    private Handler mHandler;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +34,22 @@ public class MainActivity extends AppCompatActivity {
         //Remove the notification bar (full screen)
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+
+        this.mHandler = new Handler(Looper.getMainLooper()){
+            /*
+             * handleMessage() defines the operations to perform when
+             * the Handler receives a new Message to process.
+             */
+                @Override
+                public void handleMessage(Message inputMessage) {
+                    // Gets the image task from the incoming Message object.
+
+                }
+        };
+
+
+
+        //Video
         if (mediaControls == null) {
             mediaControls = new MediaController(MainActivity.this);
         }
