@@ -37,6 +37,11 @@ public class MainActivity extends AppCompatActivity {
     private String Url = "https://en.wikipedia.org/wiki/Big_Buck_Bunny";
     private MetadataManager metadataManager;
 
+    /**
+     * Function that is called then this class is created
+     * Create the links between the xml file and its components.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,13 +97,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
         //WebView
         webview = findViewById(R.id.web_view);
         webview.setWebViewClient(new WebViewClient());
         webview.loadUrl("https://en.wikipedia.org/wiki/Big_Buck_Bunny");
-
 
         //Button
         Button btnIntro = findViewById(R.id.btnIntro);

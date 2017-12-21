@@ -56,42 +56,42 @@
             android:layout_width="fill_parent"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="Intro" />
+            android:text="@string/intro" />
 
         <Button
             android:id="@+id/btnTitle"
             android:layout_width="fill_parent"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="Title" />
+            android:text="@string/title" />
 
         <Button
             android:id="@+id/btnButterflies"
             android:layout_width="fill_parent"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="Buterflie" />
+            android:text="@string/buterflie" />
 
         <Button
             android:id="@+id/btnAssault"
             android:layout_width="fill_parent"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="Assault" />
+            android:text="@string/assault" />
 
         <Button
             android:id="@+id/btnPayback"
             android:layout_width="fill_parent"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="Payback" />
+            android:text="@string/payback" />
 
         <Button
             android:id="@+id/btnCast"
             android:layout_width="fill_parent"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="Cast" />
+            android:text="@string/cast" />
 
     </LinearLayout>
 

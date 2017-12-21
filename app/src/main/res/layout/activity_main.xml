@@ -57,42 +57,42 @@
             android:tag="Intro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Intro" />
+            android:text="@string/intro" />
 
         <Button
             android:id="@+id/btnTitle"
             android:tag="Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Title" />
+            android:text="@string/title" />
 
         <Button
             android:id="@+id/btnButterflies"
             android:tag="Butterflie"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Buterflie" />
+            android:text="@string/butterflie" />
 
         <Button
             android:id="@+id/btnAssault"
             android:tag="Assault"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Assault" />
+            android:text="@string/assault" />
 
         <Button
             android:id="@+id/btnPayback"
             android:tag="Payback"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Payback" />
+            android:text="@string/payback" />
 
         <Button
             android:id="@+id/btnCast"
             android:tag="Cast"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cast" />
+            android:text="@string/cast" />
 
     </GridLayout>
 
