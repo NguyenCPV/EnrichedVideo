@@ -14,6 +14,9 @@ import java.util.List;
  * @author Béchet Léo, Nguyen Cyprien
  */
 
+/**
+ * The objectif of the this class is to read a json file, to store metadata in a linkedList "lMeatadata"
+ */
 public class MetadataManager {
     private List<Metadata> lMetadata;
     public MetadataManager(){
@@ -32,19 +35,36 @@ public class MetadataManager {
         this.lMetadata.add(metadata);
     }
 
+    /**
+     * This function add one metadata information as Metadata object to the list lMetadata
+     * @param _msPosition
+     * @param _context
+     * @param _url
+     */
     public void add(int _msPosition,String _context, String _url){
         this.lMetadata.add(new Metadata(_msPosition,_context,_url));
     }
 
+    /**
+     * This function returns the position of the video by the context (for example "title", "intro"...)
+     * If one context matches with one metadata object's context in the lMetadata list, we return the attribute "position" (int) of this object.
+     * @param context
+     * @return the position (int) of the video that corresponds to the context of the video
+     */
     public int getPositionByContext(String context){
         for (Metadata m:this.lMetadata){
-            if(m.getContext()==context){
+            if(m.getContext().equals(context)){
                 return m.getSPosition();
             }
         }
         return -1;
     }
 
+    /**
+     * This function is used to get the context of the video that is linked with a position (int) given in parameter
+     * @param position a position of the video (in second)
+     * @return the context (string) of the video that corresponds to a position of the video
+     */
     public String getContextByPosition(int position){
         Metadata resMetadata = this.lMetadata.get(0);
         for (Metadata m:this.lMetadata){
@@ -55,6 +75,11 @@ public class MetadataManager {
         return resMetadata.getContext();
     }
 
+    /**
+     * This function is used to get the partial or the complete URL of a web site, that corresponds to the position given as parameter.
+     * @param position
+     * @return the URL (string) of a web site linked with the position of the video.
+     */
     public String getUrlByPosition(int position){
         Metadata resMetadata = this.lMetadata.get(0);
         for (Metadata m:this.lMetadata){
@@ -65,6 +90,10 @@ public class MetadataManager {
         return resMetadata.getUrl();
     }
 
+    /**
+     * Function that load the json file and store metadata in the list lMetadata by the function "add" of this class
+     * @param inputStream
+     */
     public void load(InputStream inputStream) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 

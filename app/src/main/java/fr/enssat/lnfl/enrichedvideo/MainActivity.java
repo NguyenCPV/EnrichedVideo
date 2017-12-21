@@ -137,9 +137,8 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * In this function, we work on the handler (thread + send message)
-     * The handler will (normally) receive a bundle message
+     * The handler will (normally) receive a bundle message (PROGRESS_WEB_VIEW, value)
      * The message will be treated in the handleMessage(msg) function
-     *
      */
     public void onStart(){
         Log.d(TAG,"OnStart called");
@@ -189,7 +188,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     *  Only one onclickListner function was needed in this project.
+     *  This funciton is called by all buttons of the project and will move the video to the corresponding position depending on the button's tag.
+     *  A test of verifying the tag was needed
      */
     private View.OnClickListener myOnlyHandler = new View.OnClickListener() {
         public void onClick(View v) {
@@ -206,6 +207,14 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * This function is usefull when we change the mobile orientation.
+     * Changing the orientation (for example to landscape) will recreate the activity
+     * Thus, the video will normaly restart from the biggening.
+     * We save the current position of the video and seek with the onRestoreInstanceState function.
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
