@@ -1,5 +1,8 @@
 package fr.enssat.lnfl.enrichedvideo;
 
+import android.provider.MediaStore;
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -28,6 +31,16 @@ public class MetadataManager {
         */
     }
 
+    public void show ()
+    {
+        for (Metadata m:this.lMetadata){
+            Log.d("BlaPos", " "+m.getSPosition());
+            Log.d("Blacontext", " "+m.getContext());
+            Log.d("Blaurl", " "+m.getUrl());
+
+        }
+    }
+
     public void add(Metadata metadata){
         this.lMetadata.add(metadata);
     }
@@ -38,7 +51,7 @@ public class MetadataManager {
 
     public int getPositionByContext(String context){
         for (Metadata m:this.lMetadata){
-            if(m.getContext()==context){
+            if(m.getContext().equals(context)){
                 return m.getSPosition();
             }
         }
@@ -66,6 +79,7 @@ public class MetadataManager {
     }
 
     public void load(InputStream inputStream) {
+        Log.d("verify test","call");
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         int ctr;
@@ -79,6 +93,7 @@ public class MetadataManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Log.d("verify testest","mid");
         try {
             JSONObject jObject = new JSONObject(byteArrayOutputStream.toString());
             JSONArray jArray = jObject.getJSONArray("Chapters");
@@ -90,6 +105,10 @@ public class MetadataManager {
                 title = jArray.getJSONObject(i).getString("title");
                 url = jArray.getJSONObject(i).getString("url");
                 add(pos,title, url);
+                Log.d("verify chapter",""+pos);
+                Log.d("verify chapter",""+title);
+                Log.d("verify chapter",""+url);
+
             }
         } catch (Exception e) {
             e.printStackTrace();

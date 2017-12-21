@@ -153,9 +153,6 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     while(true) {
                         if(myVideoView.isPlaying()) {
-                            Log.d(TAG, "Running, current position : " + myVideoView.getCurrentPosition());
-                            Log.d(TAG, "currentWebViewTitle : " + currentWebViewTitle);
-                            Log.d(TAG, "metadataManager.getContextByPosition(myVideoView.getCurrentPosition()/1000)) : " + metadataManager.getContextByPosition(myVideoView.getCurrentPosition()/1000));
 
                             if(!currentWebViewTitle.equals(metadataManager.getContextByPosition(myVideoView.getCurrentPosition()/1000))){
 
@@ -191,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private View.OnClickListener myOnlyHandler = new View.OnClickListener() {
         public void onClick(View v) {
+            metadataManager.show();
             //Just a test to get the tag (writing the tag directly in the xml file => getTag = null)
             Log.d(TAG,"Button on clicked, button tag: "+v.getTag());
             Log.d(TAG,"Button on clicked, video goes to : "+ metadataManager.getPositionByContext(v.getTag().toString()));
