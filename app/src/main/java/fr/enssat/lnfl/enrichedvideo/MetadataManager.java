@@ -11,6 +11,12 @@ public class MetadataManager {
     private List<Metadata> lMetadata;
     public MetadataManager(){
         this.lMetadata = new LinkedList<>();
+        add(0,"Intro","");
+        add(28,"Title","Production_history");
+        add(2*60+40,"Assault","Release");
+        add(4*60+50,"Payback","Plot");
+        add(60+15,"Butterflies","Characters");
+        add(8*60+15,"Cast","See_also");
     }
 
     public void add(Metadata metadata){

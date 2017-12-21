@@ -21,7 +21,7 @@ import android.widget.VideoView;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private final String PROGRESS_WEB_VIEW="Progress web view";
+    public static final String PROGRESS_WEB_VIEW="Progress web view";
 
     private VideoView myVideoView;
     private WebView webview;
@@ -49,23 +49,14 @@ public class MainActivity extends AppCompatActivity {
 
         //MetadataManager
         metadataManager = new MetadataManager();
-        metadataManager.add(0,"Intro","");
-        metadataManager.add(28,"Title","Production_history");
-        metadataManager.add(2*60+40,"Assault","Release");
-        metadataManager.add(4*60+50,"Payback","Plot");
-        metadataManager.add(60+15,"Butterflies","Characters");
-        metadataManager.add(8*60+15,"Cast","See_also");
-
-
-
-
+        
         //Video
+        // Find your VideoView in your video_main.xml layout
+        myVideoView = findViewById(R.id.video_view);
+
         if (mediaControls == null) {
             mediaControls = new MediaController(MainActivity.this);
         }
-
-        // Find your VideoView in your video_main.xml layout
-        myVideoView = findViewById(R.id.video_view);
 
         // Create a progressbar
         progressDialog = new ProgressDialog(MainActivity.this);
@@ -133,25 +124,19 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Handler
-        mHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg){
-                String url=msg.getData().getString(PROGRESS_WEB_VIEW);
-                Log.d(TAG,"Message received :" + url);
-                webview.loadUrl(url);
-            }
-        };
+        mHandler = new VideoWebHandler(this.webview);
     }
 
     /**
      * In this function, we work on the handler (thread + send message)
-     * The handler will (normaly) receive a bundle message
+     * The handler will (normally) receive a bundle message
      * The message will be treated in the handleMessage(msg) function
      *
      */
     public void onStart(){
         Log.d(TAG,"OnStart called");
         super.onStart();
+
         mThread = new Thread(new Runnable() {
             //Le Bundle qui porte les données du Message et sera transmis au Handler
             Bundle messageBundle=new Bundle();
@@ -184,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
 
                         }
                         //Let other threads to work
-                        Thread.sleep(1000);
+                        Thread.sleep(100);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -197,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
     private View.OnClickListener myOnlyHandler = new View.OnClickListener() {
         public void onClick(View v) {
-            //Just a test
+            //Just a test to get the tag (writing the tag directly in the xml file => getTag = null)
             Log.d(TAG,"Button on clicked, button tag: "+v.getTag());
             Log.d(TAG,"Button on clicked, video goes to : "+ metadataManager.getPositionByContext(v.getTag().toString()));
             Log.d(TAG,"Button on clicked, video currentDuration : "+myVideoView.getCurrentPosition());
