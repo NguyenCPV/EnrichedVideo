@@ -24,7 +24,8 @@ public class MetadataManager {
     private List<Metadata> lMetadata;
     public MetadataManager(){
         this.lMetadata = new LinkedList<>();
-        /*
+
+        /* Replaced in the load function (json)
         add(0,"Intro","");
         add(28,"Title","Production_history");
         add(2*60+40,"Assault","Release");
@@ -34,6 +35,9 @@ public class MetadataManager {
         */
     }
 
+    /**
+     * A test function in order to verify that all metadata is stored .
+     */
     public void show ()
     {
         for (Metadata m:this.lMetadata){
@@ -134,11 +138,8 @@ public class MetadataManager {
                 title = jArray.getJSONObject(i).getString("title");
                 url = jArray.getJSONObject(i).getString("url");
                 add(pos,title, url);
-                Log.d("verify chapter",""+pos);
-                Log.d("verify chapter",""+title);
-                Log.d("verify chapter",""+url);
-
             }
+            show();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -22,6 +22,10 @@ import java.io.InputStream;
  * @author Béchet Léo, Nguyen Cyprien
  */
 
+/**
+ * The only one activity of the project.
+ * When the application starts, this activity is created.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -44,13 +48,12 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Function that is called then this class is created
      * Create the links between the xml file and its components.
-     * @param savedInstanceState
+     * @param savedInstanceState save instance as bundle message
      */
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Get the layout from video_main.xml
+        // Get the layout from activity_main.xml
         setContentView(R.layout.activity_main);
 
         //Remove the notification bar (full screen)
@@ -62,20 +65,16 @@ public class MainActivity extends AppCompatActivity {
         metadataManager.load(is);
         
         //Video
-        // Find your VideoView in your video_main.xml layout
-        myVideoView = findViewById(R.id.video_view);
-
+        myVideoView = findViewById(R.id.video_view);    // Find your VideoView in your video_main.xml layout
         if (mediaControls == null) {
             mediaControls = new MediaController(MainActivity.this);
         }
-
         // Create a progressbar
         progressDialog = new ProgressDialog(MainActivity.this);
         // Set progressbar title
         progressDialog.setTitle("JavaCodeGeeks Android Video View Example");
         // Set progressbar message
         progressDialog.setMessage("Loading...");
-
         progressDialog.setCancelable(false);
         // Show progressbar
         progressDialog.show();
@@ -83,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
         try {
             myVideoView.setMediaController(mediaControls);
             myVideoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.bigbuckbunny));
-
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
             e.printStackTrace();
@@ -130,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
         btnPayback.setOnClickListener(myOnlyHandler);
         btnCast.setOnClickListener(myOnlyHandler);
 
-
         //Handler
         mHandler = new VideoWebHandler(this.webview);
     }
@@ -145,32 +142,28 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         mThread = new Thread(new Runnable() {
-            //Le Bundle qui porte les données du Message et sera transmis au Handler
+            //Bundle message to send to the Handler
             Bundle messageBundle=new Bundle();
-             //Le message échangé entre la Thread et le Handler
+             //The message (value) to store in the bundle and to give to the handler.
             Message myMessage;
             @Override
             public void run() {
                 try {
                     while(true) {
                         if(myVideoView.isPlaying()) {
-
+                            //We only send a message to the handler in order to change the webView
                             if(!currentWebViewTitle.equals(metadataManager.getContextByPosition(myVideoView.getCurrentPosition()/1000))){
-
                                 currentWebViewTitle = metadataManager.getContextByPosition(myVideoView.getCurrentPosition()/1000);
-                                // Envoyer le message au Handler (la méthode handler.obtainMessage est plus efficace
-                                // que créer un message à partir de rien, optimisation du pool de message du Handler)
-                                //Instanciation du message (la bonne méthode):
+                                // Message part
+                                //Create the message (optimized method)
                                 myMessage=mHandler.obtainMessage();
-                                //Ajouter des données à transmettre au Handler via le Bundle
+                                //Add the message value (the URL)
                                 messageBundle.putString(PROGRESS_WEB_VIEW, metadataManager.getUrlByPosition(myVideoView.getCurrentPosition()/1000));
-                                //Ajouter le Bundle au message
+                                //Set the message bundle as message
                                 myMessage.setData(messageBundle);
-                                //Envoyer le message
+                                //Send message
                                 mHandler.sendMessage(myMessage);
                             }
-
-
                         }
                         //Let other threads to work
                         Thread.sleep(100);
@@ -191,7 +184,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private View.OnClickListener myOnlyHandler = new View.OnClickListener() {
         public void onClick(View v) {
-            metadataManager.show();
             //Just a test to get the tag (writing the tag directly in the xml file => getTag = null)
             Log.d(TAG,"Button on clicked, button tag: "+v.getTag());
             Log.d(TAG,"Button on clicked, video goes to : "+ metadataManager.getPositionByContext(v.getTag().toString()));
@@ -224,6 +216,10 @@ public class MainActivity extends AppCompatActivity {
         myVideoView.pause();
     }
 
+    /**
+     * Function used when recreating the activity (for example when the orientation has changed)
+     * @param savedInstanceState save instance as bundle message, which points the current position of the video
+     */
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
