@@ -16,7 +16,11 @@ import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import java.io.InputStream;
 
+/**
+ * @author Béchet Léo, Nguyen Cyprien
+ */
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
         //MetadataManager
         metadataManager = new MetadataManager();
+        InputStream is = getResources().openRawResource(R.raw.chapters);
+        metadataManager.load(is);
         
         //Video
         // Find your VideoView in your video_main.xml layout
@@ -180,6 +186,9 @@ public class MainActivity extends AppCompatActivity {
         mThread.start();
     }
 
+    /**
+     *
+     */
     private View.OnClickListener myOnlyHandler = new View.OnClickListener() {
         public void onClick(View v) {
             //Just a test to get the tag (writing the tag directly in the xml file => getTag = null)
