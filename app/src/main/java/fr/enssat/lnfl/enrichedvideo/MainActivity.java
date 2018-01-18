@@ -81,7 +81,8 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             myVideoView.setMediaController(mediaControls);
-            myVideoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.bigbuckbunny));
+            //myVideoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.bigbuckbunny));
+            myVideoView.setVideoURI(Uri.parse("https://archive.org/download/Route_66_-_an_American_badDream/Route_66_-_an_American_badDream_512kb.mp4"));
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
             e.printStackTrace();
