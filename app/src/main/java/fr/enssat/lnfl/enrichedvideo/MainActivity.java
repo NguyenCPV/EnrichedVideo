@@ -9,14 +9,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
 import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * @author Béchet Léo, Nguyen Cyprien
@@ -41,9 +48,10 @@ public class MainActivity extends AppCompatActivity {
     private Handler mHandler;
     private Thread mThread;
 
-    private String currentWebViewTitle = "Intro";
-    private String Url = "https://en.wikipedia.org/wiki/Big_Buck_Bunny";
-    private MetadataManager metadataManager;
+    private JsonManager jsonManager;
+
+    public String currentWebViewTitle = "Start";
+    public String Url = "https://en.wikipedia.org/wiki/Big_Buck_Bunny";
 
     /**
      * Function that is called then this class is created
@@ -54,15 +62,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Get the layout from activity_main.xml
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_landscape_only);
 
         //Remove the notification bar (full screen)
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        //MetadataManager
-        metadataManager = new MetadataManager();
+        //JsonManager
         InputStream is = getResources().openRawResource(R.raw.chapters);
-        metadataManager.load(is);
+        jsonManager = new JsonManager(is);
         
         //Video
         myVideoView = findViewById(R.id.video_view);    // Find your VideoView in your video_main.xml layout
@@ -104,29 +111,21 @@ public class MainActivity extends AppCompatActivity {
         //WebView
         webview = findViewById(R.id.web_view);
         webview.setWebViewClient(new WebViewClient());
-        webview.loadUrl("https://en.wikipedia.org/wiki/Big_Buck_Bunny");
+        webview.loadUrl("https://wiki.creativecommons.org/wiki/Route_66_-_An_American_(bad)_Dream");
+
 
         //Button
-        Button btnIntro = findViewById(R.id.btnIntro);
-        Button btnTitle = findViewById(R.id.btnTitle);
-        Button btnAssault = findViewById(R.id.btnAssault);
-        Button btnButterflies = findViewById(R.id.btnButterflies);
-        Button btnPayback = findViewById(R.id.btnPayback);
-        Button btnCast = findViewById(R.id.btnCast);
-
-        btnIntro.setTag("Intro");
-        btnTitle.setTag("Title");
-        btnAssault.setTag("Assault");
-        btnButterflies.setTag("Butterflies");
-        btnPayback.setTag("Payback");
-        btnCast.setTag("Cast");
-
-        btnIntro.setOnClickListener(myOnlyHandler);
-        btnTitle.setOnClickListener(myOnlyHandler);
-        btnAssault.setOnClickListener(myOnlyHandler);
-        btnButterflies.setOnClickListener(myOnlyHandler);
-        btnPayback.setOnClickListener(myOnlyHandler);
-        btnCast.setOnClickListener(myOnlyHandler);
+        LinearLayout btnLinearLayout = findViewById(R.id.btnLinearLayout);
+        ArrayList<String> titles = jsonManager.getAllTitle();
+        for(String title:titles){
+            Log.d("testing", title);
+            Button btn = new Button(this);
+            btn.setText(title);
+            btn.setTag(title);
+            btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            btn.setOnClickListener(myOnlyHandler);
+            btnLinearLayout.addView(btn);
+        }
 
         //Handler
         mHandler = new VideoWebHandler(this.webview);
@@ -150,18 +149,20 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 try {
                     while(true) {
-                        if(myVideoView.isPlaying()) {
+                        if(myVideoView.isPlaying() && jsonManager != null) {
                             //We only send a message to the handler in order to change the webView
-                            if(!currentWebViewTitle.equals(metadataManager.getContextByPosition(myVideoView.getCurrentPosition()/1000))){
-                                currentWebViewTitle = metadataManager.getContextByPosition(myVideoView.getCurrentPosition()/1000);
+                            String newUrl = jsonManager.getUrlByPosition(myVideoView.getCurrentPosition()/1000);
+                            if(newUrl != null && !currentWebViewTitle.equals(newUrl)){
+                                currentWebViewTitle = newUrl;
                                 // Message part
-                                //Create the message (optimized method)
-                                myMessage=mHandler.obtainMessage();
+                                //Create new message (the message.optain() methode doesn't work here)
+                                myMessage=new Message();
                                 //Add the message value (the URL)
-                                messageBundle.putString(PROGRESS_WEB_VIEW, metadataManager.getUrlByPosition(myVideoView.getCurrentPosition()/1000));
+                                messageBundle.putString(PROGRESS_WEB_VIEW, newUrl);
                                 //Set the message bundle as message
                                 myMessage.setData(messageBundle);
                                 //Send message
+                                Log.d("SedingMessage", myMessage.toString());
                                 mHandler.sendMessage(myMessage);
                             }
                         }
@@ -174,7 +175,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         mThread.start();
+
     }
 
     /**
@@ -184,46 +187,14 @@ public class MainActivity extends AppCompatActivity {
      */
     private View.OnClickListener myOnlyHandler = new View.OnClickListener() {
         public void onClick(View v) {
-            //Just a test to get the tag (writing the tag directly in the xml file => getTag = null)
-            Log.d(TAG,"Button on clicked, button tag: "+v.getTag());
-            Log.d(TAG,"Button on clicked, video goes to : "+ metadataManager.getPositionByContext(v.getTag().toString()));
-            Log.d(TAG,"Button on clicked, video currentDuration : "+myVideoView.getCurrentPosition());
+
+            Log.d("myOnlyHandler","     " + (jsonManager.getPosFromTitle(v.getTag().toString())*1000));
             try{
-                myVideoView.seekTo(metadataManager.getPositionByContext(v.getTag().toString())*1000);
+                myVideoView.seekTo(jsonManager.getPosFromTitle(v.getTag().toString())*1000);
             } catch (Exception e){
                 Log.d(TAG, "Exception " + e);
             }
-
         }
     };
 
-    /**
-     * This function is usefull when we change the mobile orientation.
-     * Changing the orientation (for example to landscape) will recreate the activity
-     * Thus, the video will normaly restart from the biggening.
-     * We save the current position of the video and seek with the onRestoreInstanceState function.
-     *
-     * @param savedInstanceState
-     */
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        //Interrupt the current thread (or else, multiple messages are going to be sent to the handler)
-        mThread.interrupt();
-        //Save the current video position in order to restore
-        savedInstanceState.putInt("Position", myVideoView.getCurrentPosition());
-        //Pause the video (why not)
-        myVideoView.pause();
-    }
-
-    /**
-     * Function used when recreating the activity (for example when the orientation has changed)
-     * @param savedInstanceState save instance as bundle message, which points the current position of the video
-     */
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        position = savedInstanceState.getInt("Position");
-        myVideoView.seekTo(position);
-    }
 }

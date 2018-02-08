@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.Guideline
+        android:id="@+id/VerticalGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.7"
+
+        />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/HorizontalGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.85" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/horizontalGuidelineForWebviewAndMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.53" />
+
+    <VideoView
+        android:id="@+id/video_view"
+        android:layout_width="412dp"
+        android:layout_height="301dp"
+        app:layout_constraintBottom_toTopOf="@+id/HorizontalGuideline"
+        app:layout_constraintEnd_toEndOf="@+id/VerticalGuideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <WebView
+        android:id="@+id/web_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/horizontalGuidelineForWebviewAndMap"
+        app:layout_constraintStart_toEndOf="@+id/VerticalGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <HorizontalScrollView
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/VerticalGuideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/HorizontalGuideline"
+        android:layout_height="0dp"
+        android:layout_width="0dp">
+
+        <LinearLayout
+            android:id="@+id/btnLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"></LinearLayout>
+    </HorizontalScrollView>
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/VerticalGuideline"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalGuidelineForWebviewAndMap"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        />
+
+
+</android.support.constraint.ConstraintLayout>

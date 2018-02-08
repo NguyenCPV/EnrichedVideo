@@ -19,6 +19,7 @@ public class VideoWebHandler extends Handler{
 
     @Override
     public void handleMessage(Message msg){
+        Log.d("handleMessageslkjfse", msg.toString());
         String url=msg.getData().getString(MainActivity.PROGRESS_WEB_VIEW);
         Log.d("URL","Message received :" + url);
         this.webview.loadUrl(url);

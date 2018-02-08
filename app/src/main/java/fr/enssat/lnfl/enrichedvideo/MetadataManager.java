@@ -19,6 +19,7 @@ import java.util.List;
 
 /**
  * The objectif of the this class is to read a json file, to store metadata in a linkedList "lMeatadata"
+ * This is the old version, the new version is JsonManager
  */
 public class MetadataManager {
     private List<Metadata> lMetadata;
