@@ -26,6 +26,9 @@ public class JsonManager {
     private HashMap<String, String> Film;
     private ArrayList<HashMap<String, String>> Chapters;
     private ArrayList<HashMap<String, String>> Keywords;
+
+
+
     private ArrayList<HashMap<String, String>> Waypoints;
 
     public JsonManager(InputStream inputStream){
@@ -199,6 +202,13 @@ public class JsonManager {
         Log.d("show() Keywords :",this.Keywords.toString());
         Log.d("show() Waypoints :",this.Waypoints.toString());
 
+    }
+
+
+
+
+    public ArrayList<HashMap<String, String>> getWaypoints() {
+        return Waypoints;
     }
 
 }

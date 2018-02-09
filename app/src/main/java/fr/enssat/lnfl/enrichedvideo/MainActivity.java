@@ -19,7 +19,14 @@ import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONException;
 
 import java.io.InputStream;
 import java.lang.reflect.Array;
@@ -140,9 +147,48 @@ public class MainActivity extends AppCompatActivity {
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(mapViewBundle);
 
+        initMap();
 
         //Handler
         mHandler = new VideoWebHandler(this.webview);
+    }
+
+    private void initMap(){
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                try {
+                    double lat = 0.0;
+                    double lng = 0.0;
+                    String label = "";
+                    int timestamp = 0;
+                    for (HashMap<String, String> hmWaypoinnt : jsonManager.getWaypoints()) {
+                        lat = Double.parseDouble(hmWaypoinnt.get("lat"));
+                        lng = Double.parseDouble(hmWaypoinnt.get("lng"));
+                        label = hmWaypoinnt.get("label");
+                        timestamp = Integer.parseInt(hmWaypoinnt.get("timestamp"));
+                        Marker marker = googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(lat, lng))
+                                .title(label));
+                        marker.setTag(timestamp);
+                    }
+                } catch (NumberFormatException ne){
+                    ne.printStackTrace();
+                }
+                try {
+                    googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker) {
+                            int timestamp = (int) marker.getTag();
+                            myVideoView.seekTo(timestamp * 1000);
+                            return false;
+                        }
+                    });
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
 
