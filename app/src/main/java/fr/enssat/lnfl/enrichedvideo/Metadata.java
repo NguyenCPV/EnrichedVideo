@@ -2,6 +2,7 @@ package fr.enssat.lnfl.enrichedvideo;
 
 /**
  * Created by Léo on 14/12/2017.
+ * Old version (the json file is now treated with the JsonManager class)
  */
 
 public class Metadata {

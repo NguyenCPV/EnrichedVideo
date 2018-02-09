@@ -19,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import com.google.android.gms.maps.MapView;
+
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -52,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
 
     public String currentWebViewTitle = "Start";
     public String Url = "https://en.wikipedia.org/wiki/Big_Buck_Bunny";
+
+    private MapView mapView;
+    private final static String MAPVIEW_BUNDLE_KEY = "mapData";
 
     /**
      * Function that is called then this class is created
@@ -127,8 +132,29 @@ public class MainActivity extends AppCompatActivity {
             btnLinearLayout.addView(btn);
         }
 
+
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        }
+        mapView = findViewById(R.id.mapView);
+        mapView.onCreate(mapViewBundle);
+
+
         //Handler
         mHandler = new VideoWebHandler(this.webview);
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
+        if (mapViewBundle != null) {
+            mapViewBundle = new Bundle();
+            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
+        }
+        mapView.onSaveInstanceState(mapViewBundle);
     }
 
     /**
@@ -178,6 +204,13 @@ public class MainActivity extends AppCompatActivity {
 
         mThread.start();
 
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mapView.onResume();
     }
 
     /**
